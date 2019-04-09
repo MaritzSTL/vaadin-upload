@@ -337,6 +337,7 @@
           upload._addFile(file);
           flush(function() {
             expect(file.uploaded).not.to.be.ok;
+            expect(file.held).to.equal.true;
             expect(file.status).to.be.equal(upload.i18n.uploading.status.held);
             done();
           });
@@ -348,7 +349,7 @@
           upload.files = files;
           upload.files[1].complete = true;
 
-          for(var i = 0; i < upload.files.length; i++) {
+          for (var i = 0; i < upload.files.length; i++) {
             expect(upload.files[i].uploading).not.to.be.ok;
           }
           upload.addEventListener('upload-start', function(e) {
@@ -369,7 +370,7 @@
           upload.files = files;
           upload.files[2].name = tempFileName;
 
-          for(var i = 0; i < upload.files.length; i++) {
+          for (var i = 0; i < upload.files.length; i++) {
             expect(upload.files[i].uploading).not.to.be.ok;
           }
           upload.addEventListener('upload-start', function(e) {
@@ -378,12 +379,31 @@
             expect(e.detail.file.name).to.equal(tempFileName);
             expect(e.detail.file.uploading).to.be.ok;
 
-            for(var i = 0; i < upload.files.length - 1; i++) {
+            for (var i = 0; i < upload.files.length - 1; i++) {
               expect(upload.files[i].uploading).not.to.be.ok;
             }
             done();
           });
           upload.uploadFiles([upload.files[2]]);
+        });
+
+        it('should start a file upload from the file-start event', function(done) {
+          upload._addFile(file);
+          flush(function() {
+            expect(file.uploaded).not.to.be.ok;
+            expect(file.held).to.equal.true;
+            expect(file.status).to.be.equal(upload.i18n.uploading.status.held);
+
+            upload.addEventListener('upload-start', function(e) {
+              expect(e.detail.xhr).to.be.ok;
+              expect(e.detail.file).to.be.ok;
+              expect(e.detail.file.uploading).to.be.ok;
+
+              done();
+            });
+
+            upload.fire('file-start', {file: file});
+          });
         });
       });
 

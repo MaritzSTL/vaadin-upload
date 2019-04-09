@@ -25,6 +25,9 @@ Custom property | Description | Default
 `--vaadin-upload-file-status`|A mixin that is applied to the file status label|`{}`
 `--vaadin-upload-file-error`|A mixin that is applied to the file error label|`{}`
 `--vaadin-upload-file-commands`|A mixin that is applied to the buttons container|`{}`
+`--vaadin-upload-file-commands-start`|A mixin that is applied to the start button|`{}`
+`--vaadin-upload-file-commands-refresh`|A mixin that is applied to the clear button|`{}`
+`--vaadin-upload-file-commands-clear`|A mixin that is applied to the refresh button|`{}`
 `--vaadin-upload-file-progress`|A mixin that is applied to the included paper-progress|`{}`
 `--vaadin-upload-file-progress-error`|A mixin that is applied to the progress bar when error is set|`{}`
 `--vaadin-upload-file-progress-indeterminate`|A mixin that is applied to the progress bar when indeterminate|`{}`
@@ -148,9 +151,22 @@ Custom property | Description | Default
         color: var(--primary-text-color, #000);
       }
 
+      #commands [icon="vaadin-upload:start"],
       #commands [icon="vaadin-upload:refresh"],
       #commands [icon="vaadin-upload:clear"] {
         color: var(--primary-color, #00B4F0);
+      }
+
+      #commands .start {
+        @apply --vaadin-upload-file-commands-start;
+      }
+
+      #commands .refresh {
+        @apply --vaadin-upload-file-commands-refresh;
+      }
+
+      #commands .clear {
+        @apply --vaadin-upload-file-commands-clear;
       }
 
       paper-progress {
@@ -229,8 +245,9 @@ Custom property | Description | Default
       </div>
 
       <div id="commands">
-        <paper-icon-button icon="vaadin-upload:refresh" file-event="file-retry" on-tap="_fireFileEvent" hidden$="[[!file.error]]"></paper-icon-button>
-        <paper-icon-button icon="vaadin-upload:clear" file-event="file-abort" on-tap="_fireFileEvent"></paper-icon-button>
+        <paper-icon-button class="start" icon="vaadin-upload:start" file-event="file-start" on-tap="_fireFileEvent" hidden$="[[!file.held]]"></paper-icon-button>
+        <paper-icon-button class="refresh" icon="vaadin-upload:refresh" file-event="file-retry" on-tap="_fireFileEvent" hidden$="[[!file.error]]"></paper-icon-button>
+        <paper-icon-button class="clear" icon="vaadin-upload:clear" file-event="file-abort" on-tap="_fireFileEvent"></paper-icon-button>
       </div>
 
     </div>
@@ -303,13 +320,22 @@ Custom property | Description | Default
       return this.fire(button.getAttribute('file-event'), {file: this.file});
     }
 
-   /**
+    /**
     * Fired when the retry button is pressed. It is listened by `vaadin-upload`
     * which will start a new upload process of this file.
     *
     * @event file-retry
     * @param {Object} detail
-    *  @param {Object} detail.file file to retry upload of
+    * @param {Object} detail.file file to retry upload of
+    */
+
+    /**
+    * Fired when the start button is pressed. It is listened by `vaadin-upload`
+    * which will start a new upload process of this file.
+    *
+    * @event file-start
+    * @param {Object} detail
+    * @param {Object} detail.file file to start upload of
     */
 
     /**
@@ -319,7 +345,7 @@ Custom property | Description | Default
      *
      * @event file-abort
      * @param {Object} detail
-     *  @param {Object} detail.file file to abort upload of
+     * @param {Object} detail.file file to abort upload of
      */
 
     /**
@@ -329,7 +355,7 @@ Custom property | Description | Default
      *
      * @event file-remove
      * @param {Object} detail
-     *  @param {Object} detail.file file to remove from the  upload of
+     * @param {Object} detail.file file to remove from the  upload of
      */
   });
 
