@@ -151,7 +151,7 @@ Custom property | Description | Default
       <div id="buttonsPrimary">
         <div id="addFiles" on-tap="_onAddFilesClick">
           <slot name="add-button">
-            <paper-button id="addButton">
+            <paper-button id="addButton" disabled$="[[isDisabled(maxFilesReached, allowOverwrite)]]">
               [[_i18nPlural(maxFiles, i18n.addFiles, i18n.addFiles.*)]]
             </paper-button>
           </slot>
@@ -352,6 +352,14 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
+
+      /**
+       * Boolean for implement functionality for drag and drop replacement.
+       */
+      allowOverwrite: {
+        type: Boolean,
+        value: false
+      }
 
       /**
        * The object used to localize this component.
@@ -563,7 +571,7 @@ Custom property | Description | Default
     _onDragover: function(event) {
       event.preventDefault();
       if (!this.nodrop && !this._dragover) {
-        this._dragoverValid = true;
+        this._dragoverValid = this._dragoverValid && !this.allowOverwrite;
         if (this._dragoverValid) {
           this._dragRippleAction('down', event);
         }
@@ -778,10 +786,11 @@ Custom property | Description | Default
      * @param {File} file File being added
      */
     _addFile: function(file) {
-      if (this.maxFilesReached) {
+      if (this.maxFilesReached && !this.allowOverwrite) {
+        this.fire('file-reject', {file: file, error: this.i18n.error.tooManyFiles});
+        return;
+      }else if (this.maxFilesReached) {
         this.fire('file-abort');
-        // this.fire('file-reject', {file: file, error: this.i18n.error.tooManyFiles});
-        // return;
       }
       if (this.maxFileSize >= 0 && file.size > this.maxFileSize) {
         this.fire('file-reject', {file: file, error: this.i18n.error.fileIsTooBig});
@@ -811,9 +820,9 @@ Custom property | Description | Default
     },
 
     _onAddFilesClick: function() {
-      // if (this.maxFilesReached) {
-      //   return;
-      // }
+      if (this.maxFilesReached && !this.allowOverwrite) {
+        return;
+      }
 
       if (Polymer.Gestures.resetMouseCanceller) {
         /*
@@ -860,6 +869,10 @@ Custom property | Description | Default
 
     _isMultiple: function() {
       return this.maxFiles != 1;
+    },
+
+    isDisabled(maxFilesReached, allowOverwrite) {
+      return maxFilesReached || allowOverwrite;
     }
   });
 
