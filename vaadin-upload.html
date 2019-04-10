@@ -151,7 +151,7 @@ Custom property | Description | Default
       <div id="buttonsPrimary">
         <div id="addFiles" on-tap="_onAddFilesClick">
           <slot name="add-button">
-            <paper-button id="addButton" disabled$="[[isDisabled(maxFilesReached, allowOverwrite)]]">
+            <paper-button id="addButton" disabled$="[[_isDisabled(maxFilesReached, allowOverwrite)]]">
               [[_i18nPlural(maxFiles, i18n.addFiles, i18n.addFiles.*)]]
             </paper-button>
           </slot>
@@ -360,6 +360,7 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
+      /**
        * Pass-through to input's capture attribute. Allows user to trigger device inputs
        * such as camera or microphone immediately.
        */
@@ -576,7 +577,7 @@ Custom property | Description | Default
     _onDragover: function(event) {
       event.preventDefault();
       if (!this.nodrop && !this._dragover) {
-        this._dragoverValid = this._dragoverValid && !this.allowOverwrite;
+        this._dragoverValid = !this.maxFilesReached && !this.allowOverwrite;
         if (this._dragoverValid) {
           this._dragRippleAction('down', event);
         }
@@ -794,7 +795,7 @@ Custom property | Description | Default
       if (this.maxFilesReached && !this.allowOverwrite) {
         this.fire('file-reject', {file: file, error: this.i18n.error.tooManyFiles});
         return;
-      }else if (this.maxFilesReached) {
+      } else if (this.maxFilesReached) {
         this.fire('file-abort');
       }
       if (this.maxFileSize >= 0 && file.size > this.maxFileSize) {
@@ -881,7 +882,12 @@ Custom property | Description | Default
       return this.maxFiles != 1;
     },
 
-    isDisabled(maxFilesReached, allowOverwrite) {
+    /**
+     * Check if max files has reached or if is allow to overwrite.
+     * @param {Boolean} maxFilesReached
+     * @param {Boolean} allowOverwrite
+     */
+    _isDisabled: function(maxFilesReached, allowOverwrite) {
       return maxFilesReached || allowOverwrite;
     }
   });
