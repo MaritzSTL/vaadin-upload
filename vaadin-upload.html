@@ -577,7 +577,7 @@ Custom property | Description | Default
     _onDragover: function(event) {
       event.preventDefault();
       if (!this.nodrop && !this._dragover) {
-        this._dragoverValid = !this.maxFilesReached && !this.allowOverwrite;
+        this._dragoverValid = !this.maxFilesReached || this.allowOverwrite;
         if (this._dragoverValid) {
           this._dragRippleAction('down', event);
         }
@@ -888,7 +888,7 @@ Custom property | Description | Default
      * @param {Boolean} allowOverwrite
      */
     _isDisabled: function(maxFilesReached, allowOverwrite) {
-      return maxFilesReached || allowOverwrite;
+      return maxFilesReached && !allowOverwrite;
     }
   });
 
