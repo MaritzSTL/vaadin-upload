@@ -887,7 +887,7 @@ Custom property | Description | Default
      * @param {Boolean} maxFilesReached
      * @param {Boolean} allowOverwrite
      */
-    _isDisabled(maxFilesReached, allowOverwrite) {
+    _isDisabled: function(maxFilesReached, allowOverwrite) {
       return maxFilesReached && !allowOverwrite;
     }
   });
