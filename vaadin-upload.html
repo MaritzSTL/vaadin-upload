@@ -577,7 +577,7 @@ Custom property | Description | Default
     _onDragover: function(event) {
       event.preventDefault();
       if (!this.nodrop && !this._dragover) {
-        this._dragoverValid = !this.maxFilesReached && !this.allowOverwrite;
+        this._dragoverValid = !this.maxFilesReached || this.allowOverwrite;
         if (this._dragoverValid) {
           this._dragRippleAction('down', event);
         }
@@ -884,11 +884,11 @@ Custom property | Description | Default
 
     /**
      * Check if max files has reached or if is allow to overwrite.
-     * @param {Boolean} maxFilesReached
-     * @param {Boolean} allowOverwrite
+     * @param {maxFilesReached} Boolean
+     * @param {allowOverwrite} Boolean
      */
-    _isDisabled: function(maxFilesReached, allowOverwrite) {
-      return maxFilesReached || allowOverwrite;
+    _isDisabled(maxFilesReached, allowOverwrite) {
+      return maxFilesReached && !allowOverwrite;
     }
   });
 
